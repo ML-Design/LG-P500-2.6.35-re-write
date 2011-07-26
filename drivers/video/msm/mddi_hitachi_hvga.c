@@ -71,6 +71,7 @@ static void mddi_hitachi_lcd_panel_poweroff(void);
 static void mddi_hitachi_lcd_panel_store_poweron(void);
 
 #define DEBUG 1
+#undef DEBUG
 #if DEBUG
 #define EPRINTK(fmt, args...) printk(fmt, ##args)
 #else
@@ -594,11 +595,9 @@ static int mddi_hitachi_lcd_store_on(void)
 #if defined(CONFIG_MACH_MSM7X27_THUNDERG)
 	if (lge_bd_rev <= LGE_REV_E) {
 		display_table(mddi_hitachi_initialize_1st, sizeof(mddi_hitachi_initialize_1st)/sizeof(struct display_table));
-		mdelay(200);
 		display_table(mddi_hitachi_display_on_1st, sizeof(mddi_hitachi_display_on_1st) / sizeof(struct display_table));
 	} else {
 		display_table(mddi_hitachi_initialize_3rd_p500, sizeof(mddi_hitachi_initialize_3rd_p500)/sizeof(struct display_table));
-		mdelay(200);
 		display_table(mddi_hitachi_display_on_3rd, sizeof(mddi_hitachi_display_on_3rd) / sizeof(struct display_table));
 	}
 #elif defined(CONFIG_MACH_MSM7X27_THUNDERA)
@@ -610,11 +609,9 @@ static int mddi_hitachi_lcd_store_on(void)
 #else
 	if (lge_bd_rev <= LGE_REV_D) {
 		display_table(mddi_hitachi_initialize_1st, sizeof(mddi_hitachi_initialize_1st)/sizeof(struct display_table));
-		mdelay(200);
 		display_table(mddi_hitachi_display_on_1st, sizeof(mddi_hitachi_display_on_1st) / sizeof(struct display_table));
 	} else {
 		display_table(mddi_hitachi_initialize_3rd_vs660, sizeof(mddi_hitachi_initialize_3rd_vs660)/sizeof(struct display_table));
-		mdelay(200);
 		display_table(mddi_hitachi_display_on_3rd, sizeof(mddi_hitachi_display_on_3rd) / sizeof(struct display_table));
 	}
 #endif
@@ -731,7 +728,7 @@ static int mddi_hitachi_lcd_init(void)
 		pinfo->bpp = 16;
 	
 		// vsync config
-		pinfo->lcd.vsync_enable = TRUE;
+		pinfo->lcd.vsync_enable = FALSE;
 		pinfo->lcd.refx100 = (mddi_hitachi_rows_per_second * 100) /
                         		mddi_hitachi_rows_per_refresh;
 
@@ -744,7 +741,7 @@ static int mddi_hitachi_lcd_init(void)
 		pinfo->lcd.v_front_porch = 6;
 		pinfo->lcd.v_pulse_width = 4;
 
-		pinfo->lcd.hw_vsync_mode = TRUE;
+		pinfo->lcd.hw_vsync_mode = FALSE;
 		pinfo->lcd.vsync_notifier_period = (1 * HZ);
 
 		pinfo->bl_max = 4;
@@ -786,12 +783,8 @@ static void mddi_hitachi_lcd_panel_poweron(void)
 	fb_height = 480;
 
 	if(pdata && pdata->gpio) {
-	//	gpio_set_value(pdata->gpio, 1);
-	//	mdelay(10);
 		gpio_set_value(pdata->gpio, 0);
-		mdelay(10);
 		gpio_set_value(pdata->gpio, 1);
-		mdelay(2);
 	}
 }
 
@@ -809,12 +802,8 @@ static void mddi_hitachi_lcd_panel_store_poweron(void)
 	fb_height = 480;
 
 	if(pdata && pdata->gpio) {
-	//	gpio_set_value(pdata->gpio, 1);
-	//	mdelay(10);
 		gpio_set_value(pdata->gpio, 0);
-		mdelay(50);
 		gpio_set_value(pdata->gpio, 1);
-		mdelay(50);
 	}
 }
 
@@ -834,7 +823,6 @@ static void mddi_hitachi_lcd_panel_poweroff(void)
 
 	if(pdata && pdata->gpio) {
 		gpio_set_value(pdata->gpio, 0);
-		mdelay(5);
 	}
 }
 module_init(mddi_hitachi_lcd_init);
