@@ -1670,10 +1670,6 @@ static void xhci_add_in_port(struct xhci_hcd *xhci, unsigned int num_ports,
 				xhci->port_array[i] = (u8) -1;
 			}
 			/* FIXME: Should we disable the port? */
-<<<<<<< HEAD
-=======
-			continue;
->>>>>>> 0b06efa... Squashed commits for 2.6.35.11
 		}
 		xhci->port_array[i] = major_revision;
 		if (major_revision == 0x03)
@@ -1752,7 +1748,6 @@ static int xhci_setup_port_arrays(struct xhci_hcd *xhci, gfp_t flags)
 			return -ENOMEM;
 
 		port_index = 0;
-<<<<<<< HEAD
 		for (i = 0; i < num_ports; i++)
 			if (xhci->port_array[i] != 0x03) {
 				xhci->usb2_ports[port_index] =
@@ -1763,22 +1758,6 @@ static int xhci_setup_port_arrays(struct xhci_hcd *xhci, gfp_t flags)
 						xhci->usb2_ports[port_index]);
 				port_index++;
 			}
-=======
-		for (i = 0; i < num_ports; i++) {
-			if (xhci->port_array[i] == 0x03 ||
-					xhci->port_array[i] == 0 ||
-					xhci->port_array[i] == -1)
-				continue;
-
-			xhci->usb2_ports[port_index] =
-				&xhci->op_regs->port_status_base +
-				NUM_PORT_REGS*i;
-			xhci_dbg(xhci, "USB 2.0 port at index %u, "
-					"addr = %p\n", i,
-					xhci->usb2_ports[port_index]);
-			port_index++;
-		}
->>>>>>> 0b06efa... Squashed commits for 2.6.35.11
 	}
 	if (xhci->num_usb3_ports) {
 		xhci->usb3_ports = kmalloc(sizeof(*xhci->usb3_ports)*
