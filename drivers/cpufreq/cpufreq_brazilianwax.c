@@ -793,8 +793,8 @@ static int __init cpufreq_brazilianwax_init(void)
         }
 
         /* Scale up is high priority */
-        up_wq = create_rt_workqueue("kbrazilianwax_up");
-        down_wq = create_workqueue("kbrazilianwax_down");
+        up_wq = alloc_workqueue("kbrazilianwax_up", WQ_HIGHPRI | WQ_CPU_INTENSIVE, 1);
+        down_wq = alloc_workqueue("kbrazilianwax_down", 0, 1);
 
         INIT_WORK(&freq_scale_work, cpufreq_brazilianwax_freq_change_time_work);
 
