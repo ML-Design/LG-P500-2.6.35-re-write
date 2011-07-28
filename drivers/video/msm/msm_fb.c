@@ -2829,10 +2829,25 @@ static int msm_fb_ioctl(struct fb_info *info, unsigned int cmd,
 		if (ret)
 			return ret;
 
+<<<<<<< HEAD
 		mutex_lock(&msm_fb_ioctl_hist_sem);
 		ret = mfd->do_histogram(info, &hist);
 		mutex_unlock(&msm_fb_ioctl_hist_sem);
 		break;
+=======
+	spin_lock_init(&msmfb->update_lock);
+	mutex_init(&msmfb->panel_init_lock);
+	init_waitqueue_head(&msmfb->frame_wq);
+	msmfb->resume_workqueue = alloc_workqueue("panel_on", WQ_HIGHPRI | WQ_CPU_INTENSIVE, 1);
+	if (msmfb->resume_workqueue == NULL) {
+		PR_DISP_ERR("failed to create panel_on workqueue\n");
+		ret = -ENOMEM;
+		goto error_create_workqueue;
+	}
+	INIT_WORK(&msmfb->resume_work, power_on_panel);
+	msmfb->black = kzalloc(msmfb->fb->var.bits_per_pixel*msmfb->xres,
+			       GFP_KERNEL);
+>>>>>>> 43a4709... ADD: new WORKQUE code from 36.1 and rest of kernel patched dangerously by Imoseyon - modified governors by LorD ClockaN
 
 	case MSMFB_HISTOGRAM_START:
 		if (!mfd->do_histogram)
