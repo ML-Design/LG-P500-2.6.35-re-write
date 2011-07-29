@@ -800,7 +800,7 @@ static int kgsl_yamato_start(struct kgsl_device *device, unsigned int init_ram)
 	/* The core is in an indeterminate state until the reset completes
 	 * after 50ms.
 	 */
-	msleep(50);
+	msleep(10);
 
 	kgsl_yamato_regwrite(device, REG_RBBM_SOFT_RESET, 0x00000000);
 
@@ -1221,7 +1221,7 @@ static int kgsl_check_interrupt_timestamp(struct kgsl_device *device,
 #define kgsl_wait_event_interruptible_timeout(wq, condition, timeout)	\
 ({									\
 	long __ret = timeout;						\
-	__wait_event_interruptible_timeout(wq, condition, __ret);	\
+	__wait_event_interruptible_timeout_io(wq, condition, __ret);	\
 	__ret;								\
 })
 
