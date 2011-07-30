@@ -636,8 +636,11 @@ static void usb_ept_enable(struct msm_endpoint *ept, int yes,
 			n &= ~(CTRL_RXE);
 	}
 	/* complete all the updates to ept->head before enabling endpoint*/
-	dma_coherent_pre_ops();
+	mb();
 	writel(n, USB_ENDPTCTRL(ept->num));
+	
+	/* Ensure endpoint is enabled before returning */
+	dsb();
 
 	dev_dbg(&ui->pdev->dev, "ept %d %s %s\n",
 	       ept->num, in ? "in" : "out", yes ? "enabled" : "disabled");
@@ -670,13 +673,12 @@ static void usb_ept_start(struct msm_endpoint *ept)
 		req = req->next;
 	}
 
+	rmb();
 	/* link the hw queue head to the request's transaction item */
 	ept->head->next = ept->req->item_dma;
 	ept->head->info = 0;
 
-	/* flush buffers before priming ept */
-	dma_coherent_pre_ops();
-
+	mb();
 	/* during high throughput testing it is observed that
 	 * ept stat bit is not set even thoguh all the data
 	 * structures are updated properly and ept prime bit
@@ -892,6 +894,9 @@ static void handle_setup(struct usb_info *ui)
 
 	memcpy(&ctl, ui->ep0out.head->setup_data, sizeof(ctl));
 	writel(EPT_RX(0), USB_ENDPTSETUPSTAT);
+	
+	/* Ensure buffer is read before acknowledging to h/w */
+	dsb();
 
 	if (ctl.bRequestType & USB_DIR_IN)
 		atomic_set(&ui->ep0_dir, USB_DIR_IN);
@@ -1408,6 +1413,9 @@ static void usb_reset(struct usb_info *ui)
 
 	/* enable interrupts */
 	writel(STS_URI | STS_SLI | STS_UI | STS_PCI, USB_USBINTR);
+	
+	/* Ensure that h/w RESET is completed before returning */
+	dsb();
 
 	atomic_set(&ui->running, 1);
 }
@@ -2172,6 +2180,9 @@ static int msm72k_pullup_internal(struct usb_gadget *_gadget, int is_active)
 		/* S/W workaround, Issue#1 */
 		ulpi_write(ui, 0x48, 0x04);
 	}
+	
+	/* Ensure pull-up operation is completed before returning */
+	dsb();
 
 	return 0;
 }
@@ -2222,6 +2233,9 @@ static int msm72k_wakeup(struct usb_gadget *_gadget)
 	if (!is_usb_active())
 		writel(readl(USB_PORTSC) | PORTSC_FPR, USB_PORTSC);
 
+	/* Ensure that USB port is resumed before enabling the IRQ */
+	dsb();
+	
 	enable_irq(otg->irq);
 
 	return 0;
