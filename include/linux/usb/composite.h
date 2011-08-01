@@ -292,7 +292,7 @@ struct usb_composite_driver {
 	void			(*suspend)(struct usb_composite_dev *);
 	void			(*resume)(struct usb_composite_dev *);
 
-	void			(*enable_function)(struct usb_function *f, int enable);
+	int			(*enable_function)(struct usb_function *f, int enable);
 };
 
 extern int usb_composite_register(struct usb_composite_driver *);
@@ -354,9 +354,13 @@ struct usb_composite_dev {
 	/* protects at least deactivation count */
 	spinlock_t			lock;
 
-	struct switch_dev sdev;
-	/* used by usb_composite_force_reset to avoid signalling switch changes */
-	bool				mute_switch;
+       /* switch indicating connected/disconnected state */
+       struct switch_dev               sw_connected;
+       /* switch indicating current configuration */
+       struct switch_dev               sw_config;
+       /* current connected state for sw_connected */
+       bool    				connected;
+
 	struct work_struct switch_work;
 };
 
