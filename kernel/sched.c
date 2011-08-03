@@ -2061,10 +2061,8 @@ static void deactivate_task(struct rq *rq, struct task_struct *p, int flags)
 #include "sched_idletask.c"
 #include "sched_fair.c"
 #include "sched_rt.c"
-<<<<<<< HEAD
 #include "sched_autogroup.c"
-=======
->>>>>>> f371707... Merge with Linux 2.6.35.14 - sched fixups
+
 #ifdef CONFIG_SCHED_DEBUG
 # include "sched_debug.c"
 #endif
@@ -4251,14 +4249,7 @@ do_wait_for_common(struct completion *x, long timeout, int state)
 			}
 			__set_current_state(state);
 			spin_unlock_irq(&x->wait.lock);
-<<<<<<< HEAD
-			if (iowait)
-				timeout = io_schedule_timeout(timeout);
-			else
-				timeout = schedule_timeout(timeout);
-=======
 			timeout = schedule_timeout(timeout);
->>>>>>> f371707... Merge with Linux 2.6.35.14 - sched fixups
 			spin_lock_irq(&x->wait.lock);
 		} while (!x->done && timeout);
 		__remove_wait_queue(&x->wait, &wait);
