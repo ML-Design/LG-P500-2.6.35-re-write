@@ -322,7 +322,6 @@ static int cpufreq_stats_create_table_cpu(unsigned int cpu)
 	struct cpufreq_policy *policy;
 	struct cpufreq_frequency_table *table;
 	int ret = -ENODEV;
-<<<<<<< HEAD
 
 	policy = cpufreq_cpu_get(cpu);
 	if (!policy)
@@ -334,18 +333,6 @@ static int cpufreq_stats_create_table_cpu(unsigned int cpu)
 
 	ret = cpufreq_stats_create_table(policy, table);
 
-=======
-	policy = cpufreq_cpu_get(cpu);
-	if (!policy)
-		return -ENODEV;
-	
-	table = cpufreq_frequency_get_table(cpu);
-	if (!table)
-		goto out;
-	
-	ret = cpufreq_stats_create_table(policy, table);
-	
->>>>>>> 0e0ce52... fix conflicts
 out:
 	cpufreq_cpu_put(policy);
 	return ret;
@@ -363,7 +350,6 @@ static int __cpuinit cpufreq_stat_cpu_callback(struct notifier_block *nfb,
 		cpufreq_update_policy(cpu);
 		break;
 <<<<<<< HEAD
-<<<<<<< HEAD
 	case CPU_DOWN_PREPARE:
 	case CPU_DOWN_PREPARE_FROZEN:
 =======
@@ -373,20 +359,15 @@ static int __cpuinit cpufreq_stat_cpu_callback(struct notifier_block *nfb,
 >>>>>>> 0e7ca64... ADD: CPUFREQ code from 3.0rc6 kernel (by Imoseyon) - modified by LorD ClockaN
 		cpufreq_stats_free_table(cpu);
 =======
-=======
->>>>>>> 0e0ce52... fix conflicts
 	case CPU_DOWN_PREPARE:
 	case CPU_DOWN_PREPARE_FROZEN:
 		cpufreq_stats_free_sysfs(cpu);
+>>>>>>> 024e01e... ADD: CPUFREQ code from 3.0rc6 kernel (by Imoseyon) - modified by LorD ClockaN
 		break;
 	case CPU_DOWN_FAILED:
 	case CPU_DOWN_FAILED_FROZEN:
-<<<<<<< HEAD
 		cpufreq_stats_create_table_cpu(cpu);
 		break;
-=======
-	cpufreq_stats_create_table_cpu(cpu);
->>>>>>> 0e0ce52... fix conflicts
 	}
 	return NOTIFY_OK;
 }
@@ -394,11 +375,7 @@ static int __cpuinit cpufreq_stat_cpu_callback(struct notifier_block *nfb,
 /* priority=1 so this will get called before cpufreq_remove_dev */
 static struct notifier_block cpufreq_stat_cpu_notifier __refdata = {
 	.notifier_call = cpufreq_stat_cpu_callback,
-<<<<<<< HEAD
 	.priority = 1,
-=======
-	.priority = 1
->>>>>>> 0e0ce52... fix conflicts
 };
 
 static struct notifier_block notifier_policy_block = {
