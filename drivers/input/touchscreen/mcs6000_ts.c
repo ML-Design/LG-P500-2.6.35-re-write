@@ -54,6 +54,8 @@ static void mcs6000_early_suspend(struct early_suspend *h);
 static void mcs6000_late_resume(struct early_suspend *h);
 #endif
 
+#define TS_SAMPLERATE_HZ 100
+
 #define LG_FW_MULTI_TOUCH
 #define LG_FW_TOUCH_SOFT_KEY		1
 #define TOUCH_SEARCH			247
@@ -72,8 +74,8 @@ static void mcs6000_late_resume(struct early_suspend *h);
  */
 enum {
 	MCS6000_DM_TRACE_NO   = 1U << 0,
-	MCS6000_DM_TRACE_YES  = 1U << 1,
-	MCS6000_DM_TRACE_FUNC = 1U << 2,
+	MCS6000_DM_TRACE_YES  = 1U << 0,
+	MCS6000_DM_TRACE_FUNC = 1U << 0,
 };
 
 static unsigned int mcs6000_debug_mask = MCS6000_DM_TRACE_NO;
@@ -135,14 +137,6 @@ enum {
 	SINGLE_POINT_TOUCH,
 	MULTI_POINT_TOUCH,
 	MAX_TOUCH_TYPE
-};
-
-enum {
-	NO_KEY_TOUCHED,
-	KEY1_TOUCHED,
-	KEY2_TOUCHED,
-	KEY3_TOUCHED,
-	MAX_KEY_TOUCH
 };
 
 enum {
@@ -279,7 +273,7 @@ static void mcs6000_ts_work_func(struct work_struct *work)
 	/* read the registers of MCS6000 IC */
 	if (i2c_smbus_read_i2c_block_data(ts->client, MCS6000_TS_INPUT_INFO, READ_NUM, read_buf) < 0) {
 		printk(KERN_ERR "%s touch ic read error\n", __FUNCTION__);
-		goto touch_retry;
+		queue_delayed_work(mcs6000_wq, &ts->work, (HZ / TS_SAMPLERATE_HZ) );
 	}
 
 	input_type = read_buf[0] & 0x0f;
@@ -317,6 +311,7 @@ static void mcs6000_ts_work_func(struct work_struct *work)
 		if (input_type == SINGLE_POINT_TOUCH) {
 			mcs6000_single_ts_event_touch(x1, y1, PRESSED, ts);
 		}
+		queue_delayed_work(mcs6000_wq, &ts->work, (HZ / TS_SAMPLERATE_HZ) );
 #endif				
 	} else { /* touch released case */
 		if (touch_pressed) {
@@ -346,7 +341,7 @@ static void mcs6000_ts_work_func(struct work_struct *work)
 
 touch_retry:
 	if (ts->pendown) {
-		queue_delayed_work(mcs6000_wq, &ts->work, msecs_to_jiffies(ts->poll_interval));
+		queue_delayed_work(mcs6000_wq, &ts->work, (HZ / TS_SAMPLERATE_HZ) );
 	}
 	else {
 		enable_irq(ts->num_irq);
@@ -361,7 +356,7 @@ static irqreturn_t mcs6000_ts_irq_handler(int irq, void *dev_id)
 	if (gpio_get_value(ts->intr_gpio) == 0) {
 		disable_irq_nosync(ts->client->irq);
 		ts->irq_sync--;
-		queue_delayed_work(mcs6000_wq, &ts->work, msecs_to_jiffies(ts->poll_interval));
+		queue_delayed_work(mcs6000_wq, &ts->work, (HZ / TS_SAMPLERATE_HZ) );
 	}
 	else  {
 		printk(KERN_INFO "mcs6000_ts_irq_handler: check int gpio level\n");
@@ -1203,7 +1198,7 @@ static int mcs6000_ts_resume(struct i2c_client *client)
 		if (ret < 0)
 			printk(KERN_ERR "mcs6000_ts_resume: power on failed\n");
 	}
-	msleep(100);
+	msleep(10);
 
 	ret = i2c_smbus_write_byte_data(ts->client, 0x1d, 0x01); /* enable int */
 	if (ret < 0)
