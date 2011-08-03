@@ -334,12 +334,12 @@ CHECK		= sparse
 LGE_CF		= -D__CHECK_ENDIAN__ -Wcast-truncate -Wno-paren-string -Wtypesign
 CHECKFLAGS     := -D__linux__ -Dlinux -D__STDC__ -Dunix -D__unix__ \
 		  -Wbitwise -Wno-return-void $(CF) $(LGE_CF)
-MODFLAGS	= -DMODULE
+MODFLAGS	= -DMODULE -mfpu=vfp
 CFLAGS_MODULE   = $(MODFLAGS)
 AFLAGS_MODULE   = $(MODFLAGS)
 LDFLAGS_MODULE  = -T $(srctree)/scripts/module-common.lds
-CFLAGS_KERNEL	= -pipe
-AFLAGS_KERNEL	= -pipe
+CFLAGS_KERNEL	= -ffast-math -mfpu=vfp -pipe
+AFLAGS_KERNEL	= -ffast-math -mfpu=vfp -pipe
 CFLAGS_GCOV	= -fprofile-arcs -ftest-coverage
 
 
