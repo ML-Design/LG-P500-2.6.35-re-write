@@ -1,5 +1,3 @@
-menu "CPU Frequency scaling"
-
 config CPU_FREQ
 	bool "CPU Frequency scaling"
 	help
@@ -19,6 +17,19 @@ if CPU_FREQ
 
 config CPU_FREQ_TABLE
 	tristate
+
+config CPU_FREQ_DEBUG
+	bool "Enable CPUfreq debugging"
+	help
+	  Say Y here to enable CPUfreq subsystem (including drivers)
+	  debugging. You will need to activate it via the kernel
+	  command line by passing
+	     cpufreq.debug=<value>
+
+	  To get <value>, add 
+	       1 to activate CPUfreq core debugging,
+	       2 to activate CPUfreq drivers debugging, and
+	       4 to activate CPUfreq governor debugging
 
 config CPU_FREQ_STAT
 	tristate "CPU frequency translation statistics"
@@ -60,7 +71,7 @@ config CPU_FREQ_DEFAULT_GOV_PERFORMANCE
 
 config CPU_FREQ_DEFAULT_GOV_POWERSAVE
 	bool "powersave"
-	depends on EXPERT
+	depends on EMBEDDED
 	select CPU_FREQ_GOV_POWERSAVE
 	help
 	  Use the CPUFreq governor 'powersave' as default. This sets
@@ -179,6 +190,7 @@ config CPU_FREQ_GOV_CONSERVATIVE
 
 	  If in doubt, say N.
 
+<<<<<<< HEAD
 config CPU_FREQ_VDD_LEVELS
 	bool "CPU Vdd levels sysfs interface"
 	depends on CPU_FREQ_STAT
@@ -194,3 +206,6 @@ endmenu
 
 endif
 endmenu
+=======
+endif	# CPU_FREQ
+>>>>>>> parent of 0b800dd... ADD: CPUFREQ code from 3.0rc6 kernel (by Imoseyon) - modified by LorD ClockaN
